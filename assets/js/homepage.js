@@ -17,6 +17,19 @@ var formSubmitHandler = function(event) {
         alert("Please eneter a Github username");
     }
 };
+
+var buttonClickHandler = function(event) {
+    // get the language attribute from the clicked element
+    var language = event.target.getAttribute("data-language");
+
+    if (language) {
+        getFeaturedRepos(language);
+
+        // clear old content
+        repoContainerEl.textContent = "";
+    }
+};
+
 var getUserRepos = function(user) {
     // format the github api url
     var apiUrl = "https://api.github.com/users/" + user + "/repos";
@@ -39,6 +52,21 @@ var getUserRepos = function(user) {
             alert("Unable to connect to Github");
         });
     ;
+};
+
+var getFeaturedRepos= function(language) {
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                displayRepos(data.items, language);
+            });
+        }
+        else {
+            alert('Error: Github User Not Found');
+        }
+    });
 };
 
 var displayRepos = function(repos, searchTerm) {
@@ -90,32 +118,6 @@ var displayRepos = function(repos, searchTerm) {
         // append cotainer to the dom
         repoContainerEl.appendChild(repoEl);
     };
-};
-
-var getFeaturedRepos= function(language) {
-    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
-
-    fetch(apiUrl).then(function(response) {
-        if (response.ok) {
-            response.json().then(function(data) {
-                displayRepos(data.items, language);
-            });
-        }
-        else {
-            alert('Error: Github User Not Found');
-        }
-    });
-};
-var buttonClickHandler = function(event) {
-    // get the language attribute from the clicked element
-    var language = event.target.getAttribute("data-language");
-
-    if (language) {
-        getFeaturedRepos(language);
-
-        // clear old content
-        repoContainerEl.textContent = "";
-    }
 };
 userFormEl.addEventListener("submit", formSubmitHandler);
 languageButtonsEl.addEventListener("click", buttonClickHandler);
